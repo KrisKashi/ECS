@@ -14,3 +14,28 @@ runtime multibuild steps:
 - copy app, config, ssl certs
 expose port 8080
 ENTRYPOINT
+
+
+AWS Archetectiure
+
+- Fargate serverless
+ - Dont have to manage server via EC2
+ - EKS would be overkill as singular container
+
+
+ Troubleshooting:
+
+ - Security group on ECS task and ALB needs to match 
+
+ - 80 and 443 allowed but app runs on 8080 ; route through target groups 
+
+ - therefore Security group needs inbound rule of 443,80, and 8080 within its on security group
+
+ - Need to also route 80 to 443 to enforce https
+
+
+
+ - AWS Route53 manages ACM cert for ssl (https) given to the load balancer
+
+ - Cloudflare CNAME points to ALB DNS
+ 
