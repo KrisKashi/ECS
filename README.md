@@ -38,4 +38,14 @@ AWS Archetectiure
  - AWS Route53 manages ACM cert for ssl (https) given to the load balancer
 
  - Cloudflare CNAME points to ALB DNS
- 
+
+
+ Terraform 
+
+ - State file managed remotely in an s3 bucket for flexibility/ best practice
+
+ - modularised format for reusability and organisation
+
+ - use of variables to make the code more DRY
+
+ - DNS manaaged via cloudflare to be more cloud agnostic
