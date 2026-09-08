@@ -49,3 +49,12 @@ AWS Archetectiure
  - use of variables to make the code more DRY
 
  - DNS manaaged via cloudflare to be more cloud agnostic
+
+
+ ACM 
+
+ - needed cloudflare provider to validate DNS ownership, one record to connect to alb and one for ACM to connect to listener for https
+
+ - more complex but keeps the DNS cloud agnostic and flexible, maintaining cloudflares useful features.
+
+ - when adding the ACM to the listener we reference the validation resource's arn, in order to make sure it exists before being mapped to alb
