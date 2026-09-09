@@ -50,6 +50,8 @@ AWS Archetectiure
 
  - DNS manaaged via cloudflare to be more cloud agnostic
 
+- ALB is referenced by DNS name as IP addresses can change.
+
 
  ACM 
 
@@ -58,3 +60,29 @@ AWS Archetectiure
  - more complex but keeps the DNS cloud agnostic and flexible, maintaining cloudflares useful features.
 
  - when adding the ACM to the listener we reference the validation resource's arn, in order to make sure it exists before being mapped to alb
+
+
+
+ ECS
+
+ needs 
+
+ - SG  between ALB and ECR port 8080
+
+ - cluster creation
+
+ - task creation 
+
+ - service creation with the task running
+
+ - IAM roles; read ECR, read tasks, create clusters
+
+
+
+ IAM -
+
+ Role - name of a role itself, trust_policy is who can assume it
+
+ role policy - JSON doc entailing what it can do 
+
+ role
