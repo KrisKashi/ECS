@@ -12,7 +12,7 @@ resource "aws_lb_target_group" "tg-ip" {
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
   health_check {
     path = "/health"
 
@@ -30,7 +30,7 @@ resource "aws_lb_listener" "listener-https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg-ip.arn
+    target_group_arn = aws_lb_target_group.tg-ip.arn ## connect to ecs
   }
 }
 

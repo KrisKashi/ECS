@@ -11,16 +11,16 @@ terraform {
     }
   }
 
-    backend "s3" {
-        bucket = "gatus-tfstate"
-        key    = "terraform.tfstate"
-        region = "eu-west-2"
-        }
+  backend "s3" {
+    bucket = "gatus-tfstate"
+    key    = "terraform.tfstate"
+    region = "eu-west-2"
+  }
 }
 
 # Configure the providers
 provider "aws" {
-    region = "eu-west-2"
+  region = "eu-west-2"
 }
 
 provider "cloudflare" {

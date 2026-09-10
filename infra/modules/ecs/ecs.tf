@@ -22,7 +22,7 @@ resource "aws_ecs_cluster_capacity_providers" "fargate" {
 
 resource "aws_ecs_task_definition" "gatus-task" {
   family = "service"
-  container_definitions = 
+  container_definitions = jsonencode([
     {
       name      = "fargate"
       image     = "${var.repository_url}:latest"
@@ -36,7 +36,8 @@ resource "aws_ecs_task_definition" "gatus-task" {
           hostPort      = 8080
         }
       ]
-    }}
+    }])
+    }
 
 
     resource "aws_ecs_service" "gatus" {

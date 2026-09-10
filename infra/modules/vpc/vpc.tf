@@ -7,7 +7,7 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "subnet-1" {
+resource "aws_subnet" "subnet_1" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.1.0/24"
   availability_zone = "eu-west-2a"
@@ -18,7 +18,7 @@ resource "aws_subnet" "subnet-1" {
   }
 }
 
-resource "aws_subnet" "subnet-2" {
+resource "aws_subnet" "subnet_2" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.2.0/24"
   availability_zone = "eu-west-2b"
@@ -47,11 +47,11 @@ resource "aws_route_table" "rt" {
 }
 
 resource "aws_route_table_association" "s1-route" {
-  subnet_id      = aws_subnet.subnet-1.id
+  subnet_id      = aws_subnet.subnet_1.id
   route_table_id = aws_route_table.rt.id
 }
 
 resource "aws_route_table_association" "s2-route" {
-  subnet_id      = aws_subnet.subnet-2.id
+  subnet_id      = aws_subnet.subnet_2.id
   route_table_id = aws_route_table.rt.id
 }

@@ -12,4 +12,8 @@ resource "aws_iam_role" "ecs-execution" {
         Action = "sts:AssumeRole"
       }
     ]
-  })}
+  })
+  }
+
+
+

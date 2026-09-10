@@ -52,6 +52,49 @@ AWS Archetectiure
 
 - ALB is referenced by DNS name as IP addresses can change.
 
+- Output files are needed for values in modules which are referenced by other modules, EG IAM module outputs the role ARN to be used by the ecs module.
+
+Structure : Module outputs variable, variable is referenced in the variables file in other module, in main.tf value is passed in when calling to the module.*
+
+*security group lives in the main itself so can be called directly, but still needs to be set in main.
+
+debugging :
+
+- when using JSON encode, the end of the configuration block cannot be on the same line as where the jsopn encode ends, terraform prompts to use a newline.
+
+- Cloudflare provider is not by /hashicorp so needs to be explicitly declared in ACM block where needed; otherwise routes to hashicorp/cloudflare provider doesnt exist.
+
+
+- terraform main.tf needs its own variable list for every .var
+
+
+- Significant error
+
+""Error: Invalid index
+│ 
+│   on modules/acm/acm.tf line 45, in resource "aws_acm_certificate_validation" "dns":
+│   45:   validation_record_fqdns =[aws_acm_certificate.cert.domain_validation_options[0].resource_record_name] #Hostname declared explicitly as theres reported bugs in the clouudflare terraform module referencing.
+│ 
+│ Elements of a set are identified only by their value and don't have any separate index or key to select with, so it's only possible
+│ to perform operations across all elements of the set.""
+
+
+Cause: ACM data is a set, rather than a numbered list so values within it are unnumbered. Regardless of the fact I had only one domain on this project.
+
+solution : convert set to list with terraforms inbuilt function tolist()
+
+
+
+- Security groups in ECS module, needs to be defined as a list/set even if only assigning one SG.
+
+
+
+Testing:
+
+Terraform fmt : simple formatting of main and provider
+Terraform validate: used to scan for missing values/ incorrect values
+Terraform plan: check if all variables plug in as intended, and see what will be created
+
 
  ACM 
 
@@ -85,4 +128,4 @@ AWS Archetectiure
 
  role policy - JSON doc entailing what it can do 
 
- role
+
