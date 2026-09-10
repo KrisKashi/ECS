@@ -1,15 +1,11 @@
 resource "aws_lb" "alb" {
   name               = "alb"
   load_balancer_type = "application"
-  subnets = [aws_subnet.subnet-1.id,aws_subnet.subnet-2.id]
-  security_groups = [aws_security_group.web-sg.id,aws_security_group.self-rf.id]
+  subnets = var.subnet_ids
+  security_groups = var.security_group_ids
   
 
 }
-
-
-
-
 
 resource "aws_lb_target_group" "tg-ip" {
   name        = "tg"
@@ -30,7 +26,7 @@ resource "aws_lb_listener" "listener-https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   =  aws_acm_certificate_validation.cert.certificate_arn
+  certificate_arn   =  var.acm_cert
 
   default_action {
     type             = "forward"

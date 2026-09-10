@@ -19,13 +19,13 @@ resource "cloudflare_dns_record" "kristendns" { # use cloudflare provider to val
   tags = ["cloudflare-dns"]
 }
 
-resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS
+resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS by creating record
   zone_id = var.cloudflare_zone_id
   name = "kristenhaslam.com"
   ttl = 3600
   type = "CNAME"
   comment = "ALB dns"
-  content = aws_lb.alb.dns_name
+  content = var.alb_dns
   proxied = false
   tags = ["alb-dns"]
 }

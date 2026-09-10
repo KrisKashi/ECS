@@ -25,16 +25,17 @@ resource "aws_ecs_task_definition" "gatus-task" {
   container_definitions = 
     {
       name      = "fargate"
-      image     = "${aws_ecr_repository.gatus-image.repository_url}:latest"
-      cpu       = 10
+      image     = "${var.repository_url}:latest"
+      cpu       = 1024
       memory    = 512
       essential = true
+      task_role_arn = var.execution_role_arn
       portMappings = [
         {
           containerPort = 8080
           hostPort      = 8080
         }
-      ]## Need to configure IAM HERE
+      ]
     }}
 
 
@@ -45,14 +46,14 @@ resource "aws_ecs_task_definition" "gatus-task" {
   desired_count   = 1
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.tg-ip.arn
+    target_group_arn = var.tg_arn  
     container_name   = "gatus"
     container_port   = 8080
   }
   
   network_configuration {
-    subnets          = [aws_subnet.subnet-1.id,aws_subnet.subnet-2]
-    security_groups  = [aws_security_group.self-rf.id]
+    subnets          = var.subnet_ids
+    security_groups  = var.ecs_sg
     assign_public_ip = false  
   }
   
