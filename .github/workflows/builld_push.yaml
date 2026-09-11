@@ -1,0 +1,54 @@
+name: Docker Build and push
+
+on: [push,workflow_dispatch]
+
+permissions:
+        id-token: write
+        
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: ECS/gatus
+                
+        
+                
+        steps:
+        - name: checkout code
+          uses: actions/checkout@v2
+          
+        - name: Install Go
+          uses: actions/setup-go@v7 
+          with:
+            go-version: '1.26'
+
+        
+          
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v6.2.3
+          with:
+            role-to-assume: ${{ vars.ECR_ROLE}}
+            aws-region: eu-west-2
+        
+        - name: Login to ECR
+          id: ecr-login
+          uses: aws-actions/amazon-ecr-login@v2
+        
+        - name: Build / Push container to ECR
+          uses: docker/build-push-action@v7
+          with:
+            context: ./ECS
+            push: true
+            tags: |
+                 ${{ steps.ecr-login.outputs.registry }}/gatus:latest
+                 ${{ steps.ecr-login.outputs.registry }}/gatus:${{ github.sha }}  
+
+            
+            
+
+
+
+    
+    
