@@ -88,6 +88,22 @@ solution : convert set to list with terraforms inbuilt function tolist()
 - Security groups in ECS module, needs to be defined as a list/set even if only assigning one SG.
 
 
+- Record names already existing needs to be deleted in cloudflare
+
+- ECS needs to be awsvpc and needs to explicilty state fargate in the service module.
+
+- ECS CPU and memory modules were nested in the jsonencode where they need to be above it as the json is only for the container config.
+
+- ECS CPU and memory in service needs to be specific parings from preset AWS values, eg 256 cpu supports 512,1gb,2gb memory only
+
+- ECS service block needs force new deployment to be true when making changes so tasks get updated with new terraform config
+
+- ECS needs public IP to pull image from ECR registry and internet access (since we're using public subnet)
+
+, therefore needs to be in SG egress, also needs exec role to have permissions to do this in first place
+
+
+- IAM roles need to be created, defined who can assume the role, then seperate block attaches the actual permissions
 
 Testing:
 
@@ -129,3 +145,6 @@ Terraform plan: check if all variables plug in as intended, and see what will be
  role policy - JSON doc entailing what it can do 
 
 
+Future improvements:
+
+- implement auto-scaling groups

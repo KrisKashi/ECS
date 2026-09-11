@@ -11,25 +11,22 @@ resource "aws_ecs_cluster_capacity_providers" "fargate" {
   cluster_name = aws_ecs_cluster.gatus-ecs.name
 
   capacity_providers = ["FARGATE"]
-
-  default_capacity_provider_strategy {
-    base              = 1
-    weight            = 100
-    capacity_provider = "FARGATE"
-  }
 }
-
 
 resource "aws_ecs_task_definition" "gatus-task" {
   family = "service"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu       = 256
+  memory    = 512
+  execution_role_arn = var.execution_role_arn
   container_definitions = jsonencode([
     {
-      name      = "fargate"
+      name      = "gatus"
       image     = "${var.repository_url}:latest"
-      cpu       = 1024
-      memory    = 512
+      
       essential = true
-      task_role_arn = var.execution_role_arn
+      
       portMappings = [
         {
           containerPort = 8080
@@ -45,6 +42,8 @@ resource "aws_ecs_task_definition" "gatus-task" {
   cluster         = aws_ecs_cluster.gatus-ecs.id
   task_definition = aws_ecs_task_definition.gatus-task.arn
   desired_count   = 1
+  force_new_deployment = true
+  launch_type = "FARGATE"
 
   load_balancer {
     target_group_arn = var.tg_arn  
@@ -55,7 +54,7 @@ resource "aws_ecs_task_definition" "gatus-task" {
   network_configuration {
     subnets          = var.subnet_ids
     security_groups  = var.ecs_sg
-    assign_public_ip = false  
+    assign_public_ip = true  
   }
   
   }

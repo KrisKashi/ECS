@@ -13,7 +13,8 @@ module "alb" {
     security_group_ids = [aws_security_group.web-sg.id, aws_security_group.self_rf.id]
     subnet_ids = module.vpc.subnet_ids # takes output values from modules
     vpc_id = module.vpc.vpc_id
-    acm_cert = module.acm.acm_cert
+    cert_arn = module.acm.cert_arn
+    acm_cert =module.acm.acm_cert
 
 }
 
@@ -74,9 +75,18 @@ resource "aws_security_group" "self_rf" {   # Security group 2 ALB and ECS
     name = "self_rf"
     vpc_id = module.vpc.vpc_id
     ingress {
-    from_port   = 8080    
+    from_port   = 8080    #speaks to alb via tg port 8008 http traffic
     to_port     = 8080
     protocol    = "tcp"
     self = true
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"             # internet acess for ecs to pull image 
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
 }
-}
+

@@ -26,7 +26,6 @@ resource "cloudflare_dns_record" "kristendns" { # use cloudflare provider to val
   comment = "Domain verification record"
   content = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_value
   proxied = false
-  tags = ["cloudflare-dns"]
 }
 
 resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS by creating record
@@ -37,7 +36,6 @@ resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS by creat
   comment = "ALB dns"
   content = var.alb_dns
   proxied = false
-  tags = ["alb-dns"]
 }
 
 resource "aws_acm_certificate_validation" "dns" { #checks to see if the record exists

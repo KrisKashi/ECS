@@ -13,3 +13,7 @@ variable "vpc_id" {
 variable "acm_cert" {
     type = string
 }
+
+variable "cert_arn" {
+    type = string
+}
