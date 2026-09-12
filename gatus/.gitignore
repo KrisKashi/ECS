@@ -16,6 +16,3 @@ node_modules
 *.db
 *.db-shm
 *.db-wal
-gatus
-config/config.yml
-config.yaml
