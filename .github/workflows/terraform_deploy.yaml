@@ -1,0 +1,56 @@
+name: Terraform deployment 
+
+on: [push]
+
+permissions:
+       id-token: write
+       contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+               working-directory: infra
+
+
+        steps:
+
+        - name: checkout code
+          uses: actions/checkout@v2 
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v6.2.3
+          with:
+            role-to-assume: ${{ vars.TERRAFORM_ROLE}}
+            aws-region: eu-west-2
+
+        -  name: Setup Terraform
+           uses: hashicorp/setup-terraform@v4
+
+
+        - name: Terraform formatting
+          env:
+            cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          run: |
+              terraform init
+              terraform fmt 
+              terraform validate
+              
+
+
+        -  name: Terraform plan
+           run: 
+              
+              terraform plan
+
+        - name: Run terraform apply
+          env:
+            cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+          run:
+              terraform apply         
+
+            
+        
