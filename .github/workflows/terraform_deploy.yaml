@@ -30,9 +30,6 @@ jobs:
 
 
         - name: Terraform formatting
-          env:
-            cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
           run: |
               terraform init
               terraform fmt 
@@ -41,14 +38,17 @@ jobs:
 
 
         -  name: Terraform plan
-           run: 
+           run:
+           env:
+            TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}  
               
               terraform plan
 
         - name: Run terraform apply
           env:
-            cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+            TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
           run:
               terraform apply         
 
