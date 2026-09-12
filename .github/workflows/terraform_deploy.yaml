@@ -30,6 +30,9 @@ jobs:
 
 
         - name: Terraform formatting
+          env:
+            cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
           run: |
               terraform init
               terraform fmt 
