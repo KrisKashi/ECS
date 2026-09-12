@@ -44,7 +44,7 @@ jobs:
         - name: Run terraform apply
           env:
             cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-            cloudflare_zone_id: ${{ vars.}}
+            cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
           run:
               terraform apply         
 
