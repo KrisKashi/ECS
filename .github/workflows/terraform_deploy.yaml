@@ -50,7 +50,7 @@ jobs:
             TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
             TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
           run:
-              terraform apply         
+              terraform apply -auto-approve          
 
             
         
