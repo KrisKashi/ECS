@@ -148,3 +148,58 @@ Terraform plan: check if all variables plug in as intended, and see what will be
 Future improvements:
 
 - implement auto-scaling groups
+
+
+CICD pipleline:
+
+3 seperate ones
+
+1- Build and push docker image
+
+2- Terraform apply changes 
+
+3- health check domain 
+
+- seperate IAM roles for 1/2 least priveledge
+
+
+
+Troubleshooting:
+
+- Since gatus repo was cloned, it contained a .git, resulting in pushing the folder being treated like a submodule. Pipeline couldnt access files within was just a blank directory
+
+fix: remove .git and related files from gatus module, clear git cache of it, re-add gatus and commit/push.
+
+
+IAM ROLE for terraform pipeline needs to
+
+- create vpc
+- create sg
+- create subnet
+- create IGW
+- create route table
+-associate rt with subnet
+
+- create alb
+- create tg
+- create listener
+- ACM 
+
+-ECS 
+
+-s3: read only the gatus repo for least priv.
+
+
+- Pipeline stuck on terraform plan due to not passing in env variables required, same as apply.
+
+fix: manually cancel hanging pipeline, use terraform force-unlock to unlock state after. its fine to use this as no infra was affected.
+
+
+- required terraform variables in main need to be named 
+
+TF_VAR_xxxx: value
+
+to be picked up in the pipeline otherwise it hangs.
+
+
+- S3 delete permissions needed to release the lock file
