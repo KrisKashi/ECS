@@ -41,7 +41,6 @@ jobs:
         - name: Build / Push container to ECR
           uses: docker/build-push-action@v7
           with:
-            context: ./ECS
             push: true
             tags: |
                  ${{ steps.ecr-login.outputs.registry }}/gatus:latest
