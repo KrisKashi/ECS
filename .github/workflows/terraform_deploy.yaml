@@ -31,14 +31,15 @@ jobs:
 
         - name: Terraform formatting
           run: |
+              terraform init
               terraform fmt 
               terraform validate
               
 
 
-        -  name: Terraform init and plan
-           run: |
-              terraform init
+        -  name: Terraform plan
+           run: 
+              
               terraform plan
 
         - name: Run terraform apply
