@@ -34,6 +34,7 @@ module "ecs" {
     tg_arn = module.alb.tg_arn
     subnet_ids = module.vpc.subnet_ids
     ecs_sg = [aws_security_group.self_rf.id] # is a list to satisfy ecs module sg reqs
+    image_tag = var.image_tag
 }
 
 

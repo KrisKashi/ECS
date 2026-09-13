@@ -17,3 +17,7 @@ variable "subnet_ids" {
 variable "ecs_sg" {
     type = list(string)
 }
+
+variable "image_tag" {
+    type = string
+}
