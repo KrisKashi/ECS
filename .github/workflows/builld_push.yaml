@@ -43,8 +43,9 @@ jobs:
           with:
             push: true
             tags: |
-                 ${{ steps.ecr-login.outputs.registry }}/gatus:latest
-                 ${{ steps.ecr-login.outputs.registry }}/gatus:${{ github.sha }}  
+                 
+                 ${{ steps.ecr-login.outputs.registry }}/gatus-tf:${{ github.sha }}
+                 ${{ steps.ecr-login.outputs.registry }}/gatus-tf:latest   
 
             
             
