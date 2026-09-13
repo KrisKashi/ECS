@@ -149,6 +149,10 @@ Future improvements:
 
 - implement auto-scaling groups
 
+- private subnets on app for enhanced security
+
+- seperate ci/cd testing branch for cleaner commit history
+
 
 CICD pipleline:
 
@@ -203,3 +207,11 @@ to be picked up in the pipeline otherwise it hangs.
 
 
 - S3 delete permissions needed to release the lock file
+
+
+- Terraform command needs -auto-approve in pipeline or hangs on yes to confirm
+
+
+Adding GITHUB SHA image tags 
+
+- need to declare it as a variable in main, in ecs under variables and also pass it in the workflow, setting the environment variable to github.sha
