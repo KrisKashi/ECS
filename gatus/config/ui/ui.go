@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	defaultTitle                = "Health Dashboard | Gatus"
+	defaultTitle                = "Health Dashboard | Kristen | Gatus"
 	defaultDescription          = "Gatus is an advanced automated status page that lets you monitor your applications and configure alerts to notify you if there's an issue"
 	defaultHeader               = "Gatus"
-	defaultDashboardHeading     = "Health Dashboard"
-	defaultDashboardSubheading  = "Monitor the health of your endpoints in real-time"
+	defaultDashboardHeading     = "Live service monitoring"
+	defaultDashboardSubheading  = "Monitor the health of your endpoints in real-time, Deployed on AWS ECS via Terraform"
 	defaultLogo                 = ""
 	defaultLink                 = ""
 	defaultFavicon              = "/favicon.ico"
