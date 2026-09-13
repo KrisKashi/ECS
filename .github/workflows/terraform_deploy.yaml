@@ -27,9 +27,15 @@ jobs:
 
         -  name: Setup Terraform
            uses: hashicorp/setup-terraform@v4
+        
+        -  name: Setup TFlint
+           uses: terraform-linters/setup-tflint@v4
+           with:
+              tflint_version: latest
 
 
-        - name: Terraform formatting
+        - name: Terraform linting
+
           run: |
               terraform init
               terraform fmt 
@@ -41,7 +47,8 @@ jobs:
            run:
            env:
             TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
-            TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}  
+            TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+            TF_VAR_image_tag: ${{ github.sha }}  
               
               terraform plan
 
@@ -49,6 +56,7 @@ jobs:
           env:
             TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
             TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+            TF_VAR_image_tag: ${{ github.sha }}
           run:
               terraform apply -auto-approve          
 
