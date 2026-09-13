@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "gatus-task" {
   container_definitions = jsonencode([
     {
       name      = "gatus"
-      image     = "${var.repository_url}:latest"
+      image     = "${var.repository_url}:${var.image_tag}"
       
       essential = true
       
