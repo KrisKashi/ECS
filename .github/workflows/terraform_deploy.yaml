@@ -46,7 +46,7 @@ jobs:
               terraform init
               terraform fmt 
               terraform validate
-              
+              tflint --recursive
 
 
         -  name: Terraform plan
