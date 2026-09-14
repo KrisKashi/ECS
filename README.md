@@ -12,10 +12,14 @@ This project demonstrates a highly available deployment of the GO application Ga
 ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
 
-## What is Gatus and why host it
+## What is Gatus and why host it?
 
 Gatus is a service dashboard that can monitor things like DNS-Expiration, Service uptime and latency. I wanted to focus on deploying an application that was useful and devops related in order to fully emulate a production environment. I customised the monitoring dashboard to include the expiry of my domain and uptime of essential services such as GitHub and Cloudflare.
 
+## Architecture diagram
+
+
+![Architecture Diagram](/assets/ECS_DIAGRAM_centered.png)
 
 ## Live demo 
 
@@ -28,14 +32,17 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 
 - Creates the Docker image from the application everytime changes are pushed to the Github repo and pushes it to the ECR repo. Images Tagged with Git commit sha
 
+![Docker pipeline](/assets/DOCKER_BUILD_SUCCESS.png)
 
 2 -  Terraform  Deployment
 
  Runs on successfulcompletion of the docker build, initialises new terraform changes, checks via terraform validate and tflint and then applies the new changes / image to AWS.
 
-
+![Terraform Deployment workflow](/assets/TF_DEPLOY_SUCCESS.png)
 
 3 - Health Check
+
+![Health Check](/assets/HEALTH_CHECK.png)
 
 Runs a simple curl operation on the custom domain health endpoint, returns 200 upon success to confirm the service is operational.
 
@@ -49,6 +56,8 @@ Runs a simple curl operation on the custom domain health endpoint, returns 200 u
 - The domain itself is hosted on Cloudflare which makes ACM more complex, but provides benefits in the DNS remaining cloud agnostic and able utilise cloudflare features.
 
 - The AWS configuration makes use of two availability zones to make sure the application is always accessible
+
+- Https is enforced; http traffic is routed to port 443
 
 - The application is hosted on ECS Fargate removing the need to manually manage server resources, this was the best option for a singular container deployment, as something like EKS would be overkill. 
 
