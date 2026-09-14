@@ -1,217 +1,139 @@
- Docker decisons
+# Gatus End to end Fargate ECS deployment via terraform & Github actions
 
- - Scratch runtime - have to manually copy CA certs ; worth for slimmer image 
+This project demonstrates a highly available deployment of the GO application Gatus. The app is containerised using Docker, which is pushed to the AWS ECR registry, to then be ran on ECS fargate with traffic behind a load balancer. Infrastructure is managed by Terraform and the full process is handled via a Github Actions CI/CD pipeline from image build to AWS delivery, It is also hosted on a custom cloudflare domain.
 
- - Explicit alpine version in runtime to avoid latest breaking it
+## Tech stack
 
- - Multi-stage build to reduce image size
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Amazon ECS](https://img.shields.io/badge/Amazon_ECS-FF9900?style=for-the-badge&logo=amazonecs&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![Cloudflare](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)
 
+## What is Gatus and why host it
 
+Gatus is a service dashboard that can monitor things like DNS-Expiration, Service uptime and latency. I wanted to focus on deploying an application that was useful and devops related in order to fully emulate a production environment. I customised the monitoring dashboard to include the expiry of my domain and uptime of essential services such as GitHub and Cloudflare.
 
-runtime multibuild steps:
- Scratch = Ditsroless
-- find out requirements
-- copy app, config, ssl certs
-expose port 8080
-ENTRYPOINT
 
+## Live demo 
 
-AWS Archetectiure
+<video src="https://github.com/user-attachments/assets/a94d88b7-2cb4-43cc-bcb5-bd55182e29d1" controls width="600"></video>
 
-- Fargate serverless
- - Dont have to manage server via EC2
- - EKS would be overkill as singular container
 
+## Github Actions Workflow
 
- Troubleshooting:
+ 1 - Docker Build and Push -
 
- - Security group on ECS task and ALB needs to match 
+- Creates the Docker image from the application everytime changes are pushed to the Github repo and pushes it to the ECR repo. Images Tagged with Git commit sha
 
- - 80 and 443 allowed but app runs on 8080 ; route through target groups 
 
- - therefore Security group needs inbound rule of 443,80, and 8080 within its on security group
+2 -  Terraform  Deployment
 
- - Need to also route 80 to 443 to enforce https
+ Runs on successfulcompletion of the docker build, initialises new terraform changes, checks via terraform validate and tflint and then applies the new changes / image to AWS.
 
 
 
- - AWS Route53 manages ACM cert for ssl (https) given to the load balancer
+3 - Health Check
 
- - Cloudflare CNAME points to ALB DNS
+Runs a simple curl operation on the custom domain health endpoint, returns 200 upon success to confirm the service is operational.
 
 
- Terraform 
+## Architectural decisions
 
- - State file managed remotely in an s3 bucket for flexibility/ best practice
+- Docker is used to containerise the application via a multi-stage build, which reduces the image size for faster deployment and the container is run os-less in scratch as non-root for a reduced attack surface improving security.
 
- - modularised format for reusability and organisation
+- container Images are tagged with the git commit SHA for easy identification
 
- - use of variables to make the code more DRY
+- The domain itself is hosted on Cloudflare which makes ACM more complex, but provides benefits in the DNS remaining cloud agnostic and able utilise cloudflare features.
 
- - DNS manaaged via cloudflare to be more cloud agnostic
+- The AWS configuration makes use of two availability zones to make sure the application is always accessible
 
-- ALB is referenced by DNS name as IP addresses can change.
+- The application is hosted on ECS Fargate removing the need to manually manage server resources, this was the best option for a singular container deployment, as something like EKS would be overkill. 
 
-- Output files are needed for values in modules which are referenced by other modules, EG IAM module outputs the role ARN to be used by the ecs module.
+- Terraform state is hosted remotely via an S3 backend with state locking in order to avoid state conflict from two or more processes editing the file at the same time and also to provide a secure storage option for the state to work on multiple devices.
 
-Structure : Module outputs variable, variable is referenced in the variables file in other module, in main.tf value is passed in when calling to the module.*
+- Terraform resources are modularised to make the configuration easily reproducable, organised and conistent. 
 
-*security group lives in the main itself so can be called directly, but still needs to be set in main.
+- OIDC is used in the CI/CD pipeline, providing short term credentials for the repository to access AWS, with the concept of least privledge being applied, the build and deploy workflows have seperate IAM roles, scoped to their function.  
 
-debugging :
+- Secrets are managed within the Repository, with Github providing write only storage for best security practice.
 
-- when using JSON encode, the end of the configuration block cannot be on the same line as where the jsopn encode ends, terraform prompts to use a newline.
 
-- Cloudflare provider is not by /hashicorp so needs to be explicitly declared in ACM block where needed; otherwise routes to hashicorp/cloudflare provider doesnt exist.
+## Project management 
 
+This project was organised using the Github projects kanban board and centered around 3 main stages:
 
-- terraform main.tf needs its own variable list for every .var
+Stage 1 : Clickops - Deploy the infrastructure manually using the AWS console as proof of concept and to gain a clear understanding of how resources interact
 
+Stage 2 : Tear everything down and use IaC via terraform for enhanced management of the infrastructure.
 
-- Significant error
+Stage 3: Automate the whole process via a CI/CD pipeline using Github Actions, making integration of new changes easier and allowing linting and health checks.
 
-""Error: Invalid index
-│ 
-│   on modules/acm/acm.tf line 45, in resource "aws_acm_certificate_validation" "dns":
-│   45:   validation_record_fqdns =[aws_acm_certificate.cert.domain_validation_options[0].resource_record_name] #Hostname declared explicitly as theres reported bugs in the clouudflare terraform module referencing.
-│ 
-│ Elements of a set are identified only by their value and don't have any separate index or key to select with, so it's only possible
-│ to perform operations across all elements of the set.""
+## Testing
 
+- The gatus application was edited and pushed to the repo, the pipeline successfully ran and updated the changes on the domain showing proof of the automated deployment function.
 
-Cause: ACM data is a set, rather than a numbered list so values within it are unnumbered. Regardless of the fact I had only one domain on this project.
+- The CI/CD pipelines rely on succession of the previous workflow to ensure consistency with the docker image and deployment.
 
-solution : convert set to list with terraforms inbuilt function tolist()
+## Future improvments
 
 
+- Utilise automatic scaling groups for improved horizontal scaling ability
 
-- Security groups in ECS module, needs to be defined as a list/set even if only assigning one SG.
+- Seperate Testing branch to keep commit history clearer on the main.
 
+- Host the container in a private subnet and provide  internet access via a nat gateway for improved security.
 
-- Record names already existing needs to be deleted in cloudflare
+- Run a seperate pipeline for bootstrapping ( initial ECR creation) so that the infrastructure completes cleanly first time.
 
-- ECS needs to be awsvpc and needs to explicilty state fargate in the service module.
+## How to Reproduce the Setup
 
-- ECS CPU and memory modules were nested in the jsonencode where they need to be above it as the json is only for the container config.
 
-- ECS CPU and memory in service needs to be specific parings from preset AWS values, eg 256 cpu supports 512,1gb,2gb memory only
+Requirements:
 
-- ECS service block needs force new deployment to be true when making changes so tasks get updated with new terraform config
+- An AWS account with appropriate IAM permisisons
 
-- ECS needs public IP to pull image from ECR registry and internet access (since we're using public subnet)
+- Terraform >= 1.15
 
-, therefore needs to be in SG egress, also needs exec role to have permissions to do this in first place
+- A domain managed on cloudflare (or another provider with adjustments to ACM module)
 
+- Docker
 
-- IAM roles need to be created, defined who can assume the role, then seperate block attaches the actual permissions
 
-Testing:
+## Steps
 
-Terraform fmt : simple formatting of main and provider
-Terraform validate: used to scan for missing values/ incorrect values
-Terraform plan: check if all variables plug in as intended, and see what will be created
+1: Clone the repository
 
+git clone https://github.com/KrisKashi/ECS.git
 
- ACM 
 
- - needed cloudflare provider to validate DNS ownership, one record to connect to alb and one for ACM to connect to listener for https
+2: Setup remote state
 
- - more complex but keeps the DNS cloud agnostic and flexible, maintaining cloudflares useful features.
+Create an s3 bucket to store the terraform state and update the provider block with your bucket details
 
- - when adding the ACM to the listener we reference the validation resource's arn, in order to make sure it exists before being mapped to alb
 
+3: Configure secrets as a github action secrets/variables
 
+- Cloudflare token
 
- ECS
+- Cloudflare_zone_id
 
- needs 
+- Terraform_role & ECR_role with relevant permissions
+ (IAM setup)
 
- - SG  between ALB and ECR port 8080
 
- - cluster creation
+4. Setup OIDC with github actions via AWS
 
- - task creation 
+[https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws]
 
- - service creation with the task running
 
- - IAM roles; read ECR, read tasks, create clusters
+5. First deployment
 
 
+- The first deployment must run the terraform workflow first to intialise the ECR repo, without this the push workflow will not have a repo to push to.
 
- IAM -
+6. Health
 
- Role - name of a role itself, trust_policy is who can assume it
-
- role policy - JSON doc entailing what it can do 
-
-
-Future improvements:
-
-- implement auto-scaling groups
-
-- private subnets on app for enhanced security
-
-- seperate ci/cd testing branch for cleaner commit history
-
-
-CICD pipleline:
-
-3 seperate ones
-
-1- Build and push docker image
-
-2- Terraform apply changes 
-
-3- health check domain 
-
-- seperate IAM roles for 1/2 least priveledge
-
-
-
-Troubleshooting:
-
-- Since gatus repo was cloned, it contained a .git, resulting in pushing the folder being treated like a submodule. Pipeline couldnt access files within was just a blank directory
-
-fix: remove .git and related files from gatus module, clear git cache of it, re-add gatus and commit/push.
-
-
-IAM ROLE for terraform pipeline needs to
-
-- create vpc
-- create sg
-- create subnet
-- create IGW
-- create route table
--associate rt with subnet
-
-- create alb
-- create tg
-- create listener
-- ACM 
-
--ECS 
-
--s3: read only the gatus repo for least priv.
-
-
-- Pipeline stuck on terraform plan due to not passing in env variables required, same as apply.
-
-fix: manually cancel hanging pipeline, use terraform force-unlock to unlock state after. its fine to use this as no infra was affected.
-
-
-- required terraform variables in main need to be named 
-
-TF_VAR_xxxx: value
-
-to be picked up in the pipeline otherwise it hangs.
-
-
-- S3 delete permissions needed to release the lock file
-
-
-- Terraform command needs -auto-approve in pipeline or hangs on yes to confirm
-
-
-Adding GITHUB SHA image tags 
-
-- need to declare it as a variable in main, in ecs under variables and also pass it in the workflow, setting the environment variable to github.sha
+Verify the health-check pipeline passes and visit your domain to confirm successful setup!
