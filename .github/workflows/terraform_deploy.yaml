@@ -1,11 +1,13 @@
 name: Terraform deployment 
 
 on:
+  
   workflow_run:
     workflows: ["Docker Build and push"]
     types:
       - completed
     branches: [main]
+  workflow_dispatch:  
 
 permissions:
        id-token: write
@@ -14,7 +16,7 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
-        if: ${{ github.event.workflow_run.conclusion == 'success' }} # Pipeline only runs if build/push succeded
+        if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' # Pipeline only runs if build/push succeded or manually
         defaults:
             run:
                working-directory: infra

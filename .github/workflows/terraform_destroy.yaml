@@ -1,0 +1,44 @@
+name: Terraform destory
+
+on: 
+    workflow_dispatch:
+        inputs:
+            confirm:
+                description: 'Type "yes" to confirm destroying all infrastructure'
+                required: true
+
+permissions:
+        id-token: write
+        contents: read
+
+jobs:
+    destroy:
+        if: github.event.inputs.confirm == 'yes'
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: infra
+
+
+        steps:
+        - name: checkout code
+          uses: actions/checkout@v2
+          
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v6.2.3
+          with:
+             role-to-assume: ${{ vars.TERRAFORM_ROLE }}
+             aws-reigon: eu-west-2
+             
+        -  name: Setup Terraform
+           uses: hashicorp/setup-terraform@v4
+           
+           
+        - name: Terraform destroy
+          env:
+            TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
+            TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
+            TF_VAR_image_tag: ${{ github.sha }}
+          run: |
+                terraform init
+                terraform destroy -auto-approve   
