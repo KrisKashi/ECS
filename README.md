@@ -38,6 +38,8 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 
  Runs on successfulcompletion of the docker build, initialises new terraform changes, checks via terraform validate and tflint and then applies the new changes / image to AWS.
 
+ ** Boostrapping: Needs to be run first on a fresh deployment to create the ECR repository.
+
 ![Terraform Deployment workflow](/assets/TF_DEPLOY_SUCCESS.png)
 
 3 - Health Check
@@ -46,6 +48,12 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 
 Runs a simple curl operation on the custom domain health endpoint, returns 200 upon success to confirm the service is operational.
 
+4- Terraform destroy
+
+![Terraform Destroy](/assets/TF_DESTROY.png)
+![Confirmation page](/assets/DESTROY_CONFIRM.png)
+
+Tears down created resources, requires additional confirmation typing 'yes' to manually deploy
 
 ## Architectural decisions
 
@@ -85,6 +93,8 @@ Stage 3: Automate the whole process via a CI/CD pipeline using Github Actions, m
 - The gatus application was edited and pushed to the repo, the pipeline successfully ran and updated the changes on the domain showing proof of the automated deployment function.
 
 - The CI/CD pipelines rely on succession of the previous workflow to ensure consistency with the docker image and deployment.
+
+- The end to end workflow successfully replicated after running terraform destroy, adhering to the bootstrapping protocol for this design.
 
 ## Future improvments
 
@@ -141,8 +151,8 @@ Create an s3 bucket to store the terraform state and update the provider block w
 5. First deployment
 
 
-- The first deployment must run the terraform workflow first to intialise the ECR repo, without this the push workflow will not have a repo to push to.
+- The first deployment must run the terraform workflow first to intialise the ECR repo, without this the push workflow will not have a repo to push to. From there you can run the Build and push workflow and the entire operation should complete successfully.
 
 6. Health
 
-Verify the health-check pipeline passes and visit your domain to confirm successful setup!
+Verify the health-check pipeline passes and visit your domain to confirm successful setup!, it may take longer to load on browser due to DNS cache/propogation but the status of the pipeline can be trusted.
