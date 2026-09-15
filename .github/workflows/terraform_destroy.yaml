@@ -28,7 +28,7 @@ jobs:
           uses: aws-actions/configure-aws-credentials@v6.2.3
           with:
              role-to-assume: ${{ vars.TERRAFORM_ROLE }}
-             aws-reigon: eu-west-2
+             aws-region: eu-west-2
              
         -  name: Setup Terraform
            uses: hashicorp/setup-terraform@v4
