@@ -215,3 +215,8 @@ to be picked up in the pipeline otherwise it hangs.
 Adding GITHUB SHA image tags 
 
 - need to declare it as a variable in main, in ecs under variables and also pass it in the workflow, setting the environment variable to github.sha
+
+
+- Destroy pipeline required me to add force_delete within the ECR block, as otherwise terraform refuses to delete ECR repos with images inside
+
+- Destroy pipeline requires an image tag variable name even if it doesnt exist to reference
