@@ -10,9 +10,6 @@ variable "vpc_id" {
     type = string   
 }
 
-variable "acm_cert" {
-    type = string
-}
 
 variable "cert_arn" {
     type = string

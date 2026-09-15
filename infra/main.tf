@@ -1,7 +1,6 @@
 
 module "acm" {
   source = "./modules/acm"
-  cloudflare_token = var.cloudflare_token
   cloudflare_zone_id = var.cloudflare_zone_id
 
   alb_dns = module.alb.alb_dns
@@ -14,7 +13,7 @@ module "alb" {
     subnet_ids = module.vpc.subnet_ids # takes output values from modules
     vpc_id = module.vpc.vpc_id
     cert_arn = module.acm.cert_arn
-    acm_cert =module.acm.acm_cert
+   
 
 }
 
