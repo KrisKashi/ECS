@@ -26,7 +26,7 @@ resource "aws_acm_certificate" "cert" {
 resource "cloudflare_dns_record" "kristendns" { # use cloudflare provider to validate ownership to issue cert
   zone_id = var.cloudflare_zone_id
   name = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name # takes first value from list of record names created from ACM which will be the one we just requested
-  ttl = 3600
+  ttl = 300
   type = "CNAME"
   comment = "Domain verification record"
   content = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_value
