@@ -17,25 +17,22 @@ resource "aws_vpc" "main" {
   }
 }
 
-resource "aws_subnet" "subnet_1" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.1.0/24"
-  availability_zone = "eu-west-2a"
-  map_public_ip_on_launch = true
 
-  tags = {
-    Name = "subnet1"
-  }
+## new combined subnet
+
+locals {
+   availability_zones = ["eu-west-2a","eu-west-2b"]
 }
 
-resource "aws_subnet" "subnet_2" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "eu-west-2b"
-  map_public_ip_on_launch = true
 
-  tags = {
-    Name = "subnet2"
+resource "aws_subnet" "subnet" {
+  count = 2
+  vpc_id = aws_vpc.main.id
+  cidr_block = cidrsubnet("10.0.0.0/16",8, count.index +1 )
+  availability_zone = local.availability_zones[count.index]
+
+tags = {
+    Name = "subnet.${count.index + 1}"
   }
 }
 

@@ -14,10 +14,22 @@ variable "subnet_ids" {
     type = list(string)   
 }
 
-variable "ecs_sg" {
-    type = list(string)
-}
-
 variable "image_tag" {
     type = string
+}
+
+variable "ecs_cpu" {
+    type = string
+
+}
+
+variable "ecs_memory" {
+    type = string
+
+}
+
+
+variable "vpc_id" {
+    type = string
+
 }

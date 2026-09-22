@@ -15,7 +15,7 @@ resource "aws_lb" "alb" {
   name               = "alb"
   load_balancer_type = "application"
   subnets = var.subnet_ids
-  security_groups = var.security_group_ids
+  security_groups = [aws_security_group.web-sg.id,var.self_sg]
   
 
 }
@@ -61,4 +61,31 @@ resource "aws_lb_listener" "listener-http" {
       status_code = "HTTP_301"
     }
   }
+}
+
+resource "aws_security_group" "web-sg" {   # Security group 1 Client to  ALB
+    name = "web-sg"
+    vpc_id = var.vpc_id
+    ingress {
+    from_port   = 80    #http
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+    ingress { #https
+        from_port   = 443
+        to_port     = 443
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+
 }

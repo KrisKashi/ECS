@@ -29,8 +29,8 @@ resource "aws_ecs_task_definition" "gatus-task" {
   family = "service"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu       = 256
-  memory    = 512
+  cpu       = var.ecs_cpu
+  memory    = var.ecs_memory
   execution_role_arn = var.execution_role_arn
   container_definitions = jsonencode([
     {
@@ -65,8 +65,27 @@ resource "aws_ecs_task_definition" "gatus-task" {
   
   network_configuration {
     subnets          = var.subnet_ids
-    security_groups  = var.ecs_sg
+    security_groups  = [aws_security_group.self_rf.id]
     assign_public_ip = true  
   }
   
   }
+
+  resource "aws_security_group" "self_rf" {   # Security group 2 ALB and ECS
+    name = "self_rf"
+    vpc_id = var.vpc_id
+    ingress {
+    from_port   = 8080    #speaks to alb via tg port 8080 http traffic
+    to_port     = 8080
+    protocol    = "tcp"
+    self = true
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"             # internet acess for ecs to pull image 
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+}
