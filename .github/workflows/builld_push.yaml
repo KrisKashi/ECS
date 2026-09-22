@@ -38,4 +38,14 @@ jobs:
             tags: |
                  
                  ${{ steps.ecr-login.outputs.registry }}/gatus-tf:${{ github.sha }}
-                 ${{ steps.ecr-login.outputs.registry }}/gatus-tf:latest   
+                 ${{ steps.ecr-login.outputs.registry }}/gatus-tf:latest
+        
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@v0.36.0
+          with:
+            image-ref: ${{ steps.ecr-login.outputs.registry }}/gatus-tf:${{ github.sha }} 
+            format: 'table'
+            exit-code: '1'
+            ignore-unfixed: true
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'            
