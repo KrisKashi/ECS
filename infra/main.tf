@@ -12,9 +12,7 @@ module "alb" {
     self_sg = module.ecs.self_sg
     subnet_ids = module.vpc.subnet_ids # takes output values from modules
     vpc_id = module.vpc.vpc_id
-    cert_arn = module.acm.cert_arn
-   
-
+    cert_arn = module.acm.cert_arn   
 }
 
 module "ecr" {
@@ -40,6 +38,7 @@ module "ecs" {
 
 module "vpc"{
     source = "./modules/vpc"
+    cidr_block = "10.0.0.0/16"
 }
 
 

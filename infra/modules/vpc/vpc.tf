@@ -9,7 +9,7 @@ terraform {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block       = "10.0.0.0/16"
+  cidr_block       = var.cidr_block
   instance_tenancy = "default"
 
   tags = {
@@ -28,7 +28,7 @@ locals {
 resource "aws_subnet" "subnet" {
   count = 2
   vpc_id = aws_vpc.main.id
-  cidr_block = cidrsubnet("10.0.0.0/16",8, count.index +1 )
+  cidr_block = cidrsubnet(var.cidr_block,8, count.index +1 )
   availability_zone = local.availability_zones[count.index]
 
 tags = {
