@@ -12,5 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+
+      - name: wait for gatus to stabilize
+        run: sleep 30
+
       - name: Post-deploy health check
         run: curl -f https://kristenhaslam.com/health

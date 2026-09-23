@@ -49,13 +49,13 @@ jobs:
 
 
         -  name: Terraform plan
-           run:
+           run: terraform plan
            env:
             TF_VAR_cloudflare_token: ${{ secrets.CLOUDFLARE_TOKEN }}
             TF_VAR_cloudflare_zone_id: ${{ vars.CLOUDFLARE_ZONE_ID }}
             TF_VAR_image_tag: ${{ github.sha }}  
               
-              terraform plan
+              
               
         - name: Run terraform apply
           env:
