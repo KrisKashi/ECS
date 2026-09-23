@@ -66,18 +66,12 @@ resource "aws_route_table_association" "public_subnets" {
   count          = 2
   subnet_id      = aws_subnet.subnet[count.index].id
   route_table_id = aws_route_table.rt.id
-  tags = {
-    Name = "public_route_table"
-  }
 }
 
 resource "aws_route_table_association" "private_subnets" {
   count          = 2
   subnet_id      = aws_subnet.subnet_priv[count.index].id
   route_table_id = aws_route_table.rt_nat[count.index].id
-  tags = {
-    Name = "private_route_table"
-  }
 }
 
 resource "aws_eip" "nat_ip" {
