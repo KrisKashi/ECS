@@ -1,16 +1,15 @@
-
 variable "subnet_ids" {
-  type = list(string)
+    type = list(string)   
 }
 
 variable "cert_arn" {
-  type = string
+    type = string
 }
 
 variable "vpc_id" {
-  type = string
+    type = string
 }
 
 variable "self_sg" {
-  type = string
+    type = string
 }
