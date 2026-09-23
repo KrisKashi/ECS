@@ -1,33 +1,24 @@
 terraform {
-  required_version = ">= 1.15"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "~> 5"
-    }
+  cloudflare = {
+    source  = "cloudflare/cloudflare"
+    version = "~> 5"
   }
 }
 
-
 resource "aws_acm_certificate" "cert" {
   domain_name       = "kristenhaslam.com"
-  validation_method = "DNS"                 # request to issue a cert 
+  validation_method = "DNS" # request to issue a cert 
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-
 resource "cloudflare_dns_record" "kristendns" { # use cloudflare provider to validate ownership to issue cert
   zone_id = var.cloudflare_zone_id
-  name = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name # takes first value from list of record names created from ACM which will be the one we just requested
-  ttl = 300
-  type = "CNAME"
+  name    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name # takes first value from list of record names created from ACM which will be the one we just requested
+  ttl     = 300
+  type    = "CNAME"
   comment = "Domain verification record"
   content = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_value
   proxied = false
@@ -35,9 +26,9 @@ resource "cloudflare_dns_record" "kristendns" { # use cloudflare provider to val
 
 resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS by creating record
   zone_id = var.cloudflare_zone_id
-  name = "kristenhaslam.com"
-  ttl = 3600
-  type = "CNAME"
+  name    = "kristenhaslam.com"
+  ttl     = 3600
+  type    = "CNAME"
   comment = "ALB dns"
   content = var.alb_dns
   proxied = false
@@ -45,5 +36,5 @@ resource "cloudflare_dns_record" "alb-dns" { # points domain to alb DNS by creat
 
 resource "aws_acm_certificate_validation" "dns" { #checks to see if the record exists
   certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns =[tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name] #Hostname declared explicitly as theres reported bugs in the clouudflare terraform module referencing.
+  validation_record_fqdns = [tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name] #Hostname declared explicitly as theres reported bugs in the clouudflare terraform module referencing.
 }

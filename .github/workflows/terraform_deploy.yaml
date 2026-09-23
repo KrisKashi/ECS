@@ -63,3 +63,13 @@ jobs:
             TF_VAR_image_tag: ${{ github.sha }}
           run:
               terraform apply -auto-approve
+        
+        - name: Run Trivy vulnerability scanner in IaC mode
+          uses: aquasecurity/trivy-action@v0.36.0
+          with:
+            scan-type: 'config'
+            hide-progress: true
+            format: 'sarif'
+            output: 'trivy-results.sarif'
+            exit-code: '0'   # continues and doesnt fail the job on failure, simply reports
+            severity: 'CRITICAL,HIGH'      

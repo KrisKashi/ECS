@@ -1,35 +1,35 @@
 variable "execution_role_arn" {
-    type = string   
+  type = string
 }
 
 variable "repository_url" {
-    type = string   
+  type = string
 }
 
 variable "tg_arn" {
-    type = string   
+  type = string
 }
 
 variable "subnet_ids_ecs" {
-    type = list(string)   
+  type = list(string)
 }
 
 variable "image_tag" {
-    type = string
+  type = string
 }
 
 variable "ecs_cpu" {
-    type = string
+  type = string
 
 }
 
 variable "ecs_memory" {
-    type = string
+  type = string
 
 }
 
 
 variable "vpc_id" {
-    type = string
+  type = string
 
 }

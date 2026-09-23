@@ -1,11 +1,11 @@
 variable "cloudflare_token" {
-    type = string   
+  type = string
 }
 
 variable "cloudflare_zone_id" {
-    type = string   
+  type = string
 }
 
 variable "image_tag" {
-    type = string   
+  type = string
 }

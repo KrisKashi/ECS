@@ -14,9 +14,9 @@ terraform {
 resource "aws_lb" "alb" {
   name               = "alb"
   load_balancer_type = "application"
-  subnets = var.subnet_ids
-  security_groups = [aws_security_group.web-sg.id,var.self_sg]
-  
+  subnets            = var.subnet_ids
+  security_groups    = [aws_security_group.web-sg.id, var.self_sg]
+
 
 }
 
@@ -39,7 +39,7 @@ resource "aws_lb_listener" "listener-https" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   =  var.cert_arn
+  certificate_arn   = var.cert_arn
 
   default_action {
     type             = "forward"
@@ -53,7 +53,7 @@ resource "aws_lb_listener" "listener-http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"               # This listener forces https by redirecting http traffic to https
+    type = "redirect" # This listener forces https by redirecting http traffic to https
 
     redirect {
       port        = "443"
@@ -63,29 +63,29 @@ resource "aws_lb_listener" "listener-http" {
   }
 }
 
-resource "aws_security_group" "web-sg" {   # Security group 1 Client to  ALB
-    name = "web-sg"
-    vpc_id = var.vpc_id
-    ingress {
-    from_port   = 80    #http
+resource "aws_security_group" "web-sg" { # Security group 1 Client to  ALB
+  name   = "web-sg"
+  vpc_id = var.vpc_id
+  ingress {
+    from_port   = 80 #http
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-}
+  }
 
-    ingress { #https
-        from_port   = 443
-        to_port     = 443
-        protocol    = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
+  ingress { #https
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    egress {
-        from_port   = 0
-        to_port     = 0
-        protocol    = "-1"
-        cidr_blocks = ["0.0.0.0/0"]
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
 
-    }
+  }
 
 }
