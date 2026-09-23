@@ -1,6 +1,13 @@
 name: Docker Build and push
 
-on: [push,workflow_dispatch]
+on:
+  push:
+    paths:
+      - 'gatus/**'
+      - 'infra/**'
+      - 'Dockerfile'
+
+  workflow_dispatch:
 
 permissions:
         id-token: write
