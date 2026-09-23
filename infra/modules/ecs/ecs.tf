@@ -64,9 +64,9 @@ resource "aws_ecs_task_definition" "gatus-task" {
   }
   
   network_configuration {
-    subnets          = var.subnet_ids
+    subnets          = var.subnet_ids_ecs
     security_groups  = [aws_security_group.self_rf.id]
-    assign_public_ip = true  
+    assign_public_ip = false ## not needed now that we use private subnet  
   }
   
   }

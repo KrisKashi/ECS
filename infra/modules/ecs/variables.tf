@@ -10,7 +10,7 @@ variable "tg_arn" {
     type = string   
 }
 
-variable "subnet_ids" {
+variable "subnet_ids_ecs" {
     type = list(string)   
 }
 
