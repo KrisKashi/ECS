@@ -17,7 +17,7 @@ resource "aws_subnet" "subnet" { ## Public subnets
   availability_zone = local.availability_zones[count.index]
 
   tags = {
-    Name = "subnet.${count.index + 1}"
+    Name = "gatus_public_subnet.${count.index + 1}"
   }
 }
 
@@ -28,7 +28,7 @@ resource "aws_subnet" "subnet_priv" {
   availability_zone = local.availability_zones[count.index]
 
   tags = {
-    Name = "subnet_priv.${count.index + 1}"
+    Name = "gatus_subnet_priv.${count.index + 1}"
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "main"
+    Name = "gatus internet gateway"
   }
 }
 
@@ -56,24 +56,36 @@ resource "aws_route_table" "rt_nat" {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat[count.index].id
   }
+  tags = {
+    Name = "nat_route_table"
+  }
+
 }
 
 resource "aws_route_table_association" "public_subnets" {
   count          = 2
   subnet_id      = aws_subnet.subnet[count.index].id
   route_table_id = aws_route_table.rt.id
-
+  tags = {
+    Name = "public_route_table"
+  }
 }
 
 resource "aws_route_table_association" "private_subnets" {
   count          = 2
   subnet_id      = aws_subnet.subnet_priv[count.index].id
   route_table_id = aws_route_table.rt_nat[count.index].id
+  tags = {
+    Name = "private_route_table"
+  }
 }
 
 resource "aws_eip" "nat_ip" {
   count  = 2
   domain = "vpc"
+  tags = {
+    Name = "elastic-ips-nat"
+  }
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -82,8 +94,7 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.subnet[count.index].id
 
   tags = {
-    Name = "gw NAT"
+    Name = "NAT_gateway"
   }
-
   depends_on = [aws_internet_gateway.gw]
 }

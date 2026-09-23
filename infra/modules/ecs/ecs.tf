@@ -5,12 +5,9 @@ resource "aws_ecs_cluster" "gatus-ecs" {
     name  = "containerInsights"
     value = "enabled"
   }
-}
-
-resource "aws_ecs_cluster_capacity_providers" "fargate" {
-  cluster_name = aws_ecs_cluster.gatus-ecs.name
-
-  capacity_providers = ["FARGATE"]
+  tags = {
+    Name = "gatus-cluster"
+  }
 }
 
 resource "aws_ecs_task_definition" "gatus-task" {
@@ -32,6 +29,9 @@ resource "aws_ecs_task_definition" "gatus-task" {
         }
       ]
   }])
+  tags = {
+    Name = "gatus_ecs_task"
+  }
 }
 
 resource "aws_ecs_service" "gatus" {
@@ -51,9 +51,11 @@ resource "aws_ecs_service" "gatus" {
   network_configuration {
     subnets          = var.subnet_ids_ecs
     security_groups  = [aws_security_group.self_rf.id]
-    assign_public_ip = false ##  public ip not needed now that we use private subnet  
+    assign_public_ip = false #public ip not needed now that we use private subnet  
   }
-
+  tags = {
+    Name = "gatus_ecs_service"
+  }
 }
 
 resource "aws_security_group" "self_rf" { # Security group 2 ALB and ECS
@@ -72,5 +74,8 @@ resource "aws_security_group" "self_rf" { # Security group 2 ALB and ECS
     protocol    = "-1" # internet acess for ecs to pull image 
     cidr_blocks = ["0.0.0.0/0"]
 
+  }
+  tags = {
+    Name = "gatus_ecs_SG"
   }
 }

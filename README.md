@@ -23,7 +23,7 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 
 ## Live demo 
 
-<video src="https://github.com/user-attachments/assets/a94d88b7-2cb4-43cc-bcb5-bd55182e29d1" controls width="600"></video>
+![Gatus Demo](/assets/demo.gif)
 
 
 ## Github Actions Workflow
@@ -59,6 +59,10 @@ Tears down created resources, requires additional confirmation typing 'yes' to m
 
 - Docker is used to containerise the application via a multi-stage build, which reduces the image size for faster deployment and the container is run os-less in scratch as non-root for a reduced attack surface improving security.
 
+- OIDC is used in the CI/CD pipeline, providing short term credentials for the repository to access AWS, with the concept of least privledge being applied, the build and deploy workflows have seperate IAM roles, scoped to their function.
+
+- The ECS service runs in a private subnet, with internet access through a nat gateway.
+
 - container Images are tagged with the git commit SHA for easy identification
 
 - The domain itself is hosted on Cloudflare which makes ACM more complex, but provides benefits in the DNS remaining cloud agnostic and able utilise cloudflare features.
@@ -72,8 +76,6 @@ Tears down created resources, requires additional confirmation typing 'yes' to m
 - Terraform state is hosted remotely via an S3 backend with state locking in order to avoid state conflict from two or more processes editing the file at the same time and also to provide a secure storage option for the state to work on multiple devices.
 
 - Terraform resources are modularised to make the configuration easily reproducable, organised and conistent. 
-
-- OIDC is used in the CI/CD pipeline, providing short term credentials for the repository to access AWS, with the concept of least privledge being applied, the build and deploy workflows have seperate IAM roles, scoped to their function.  
 
 - Secrets are managed within the Repository, with Github providing write only storage for best security practice.
 
@@ -98,17 +100,15 @@ Stage 3: Automate the whole process via a CI/CD pipeline using Github Actions, m
 
 ## Future improvments
 
-
 - Utilise automatic scaling groups for improved horizontal scaling ability
 
 - Seperate Testing branch to keep commit history clearer on the main.
 
-- Host the container in a private subnet and provide  internet access via a nat gateway for improved security.
+- Host the container in a private subnet and provide  internet access via a nat gateway for improved security. (DONE)
 
 - Run a seperate pipeline for bootstrapping ( initial ECR creation) so that the infrastructure completes cleanly first time.
 
 ## How to Reproduce the Setup
-
 
 Requirements:
 

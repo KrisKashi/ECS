@@ -13,6 +13,9 @@ resource "aws_iam_role" "ecs-execution" {
       }
     ]
   })
+  tags = {
+    Name = "execution-role"
+  }
 }
 
 

@@ -1,23 +1,12 @@
-terraform {
-  required_version = ">= 1.15"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.0"
-    }
-  }
-}
-
-
-
-
 resource "aws_lb" "alb" {
-  name               = "alb"
-  load_balancer_type = "application"
-  subnets            = var.subnet_ids
-  security_groups    = [aws_security_group.web-sg.id, var.self_sg]
-
-
+  name                       = "alb"
+  load_balancer_type         = "application"
+  subnets                    = var.subnet_ids
+  security_groups            = [aws_security_group.web-sg.id, var.self_sg]
+  drop_invalid_header_fields = true
+  tags = {
+    Name = "gatus_alb"
+  }
 }
 
 resource "aws_lb_target_group" "tg-ip" {
@@ -28,8 +17,9 @@ resource "aws_lb_target_group" "tg-ip" {
   vpc_id      = var.vpc_id
   health_check {
     path = "/health"
-
-
+  }
+  tags = {
+    Name = "gatus_target_group"
   }
 }
 
@@ -44,6 +34,9 @@ resource "aws_lb_listener" "listener-https" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.tg-ip.arn ## connect to ecs
+  }
+  tags = {
+    Name = "gatus_alb_https_listener"
   }
 }
 
@@ -60,6 +53,9 @@ resource "aws_lb_listener" "listener-http" {
       protocol    = "HTTPS"
       status_code = "HTTP_301"
     }
+  }
+  tags = {
+    Name = "gatus_alb_http_listener"
   }
 }
 
@@ -87,5 +83,7 @@ resource "aws_security_group" "web-sg" { # Security group 1 Client to  ALB
     cidr_blocks = ["0.0.0.0/0"]
 
   }
-
+  tags = {
+    Name = "gatus_alb_sg"
+  }
 }
