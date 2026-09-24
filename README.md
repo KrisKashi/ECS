@@ -19,7 +19,7 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 ## Architecture diagram
 
 
-<img src="/assets/ECS_DIAGRAM_centered.png" width="400">
+<img src="/assets/ECS_DIAGRAM_centered.png" width="600">
 
 ## Live demo 
 
