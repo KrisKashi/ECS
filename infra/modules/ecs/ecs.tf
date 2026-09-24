@@ -38,7 +38,7 @@ resource "aws_ecs_service" "gatus" {
   name                 = "gatus"
   cluster              = aws_ecs_cluster.gatus-ecs.id
   task_definition      = aws_ecs_task_definition.gatus-task.arn
-  desired_count        = 1
+  desired_count        = 2
   force_new_deployment = true
   launch_type          = "FARGATE"
 

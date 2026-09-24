@@ -24,7 +24,7 @@ resource "aws_subnet" "subnet" { ## Public subnets
 resource "aws_subnet" "subnet_priv" {
   count             = 2
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 5)
+  cidr_block        = cidrsubnet(var.cidr_block, 8, count.index + 5) #inbuilt function on terraform to create cidr blocks for subnetting
   availability_zone = local.availability_zones[count.index]
 
   tags = {

@@ -30,15 +30,15 @@ Gatus is a service dashboard that can monitor things like DNS-Expiration, Servic
 
  1 - Docker Build and Push -
 
-- Creates the Docker image from the application everytime changes are pushed to the Github repo and pushes it to the ECR repo. Images Tagged with Git commit sha
+- Creates the Docker image from the application everytime changes are pushed to the Github repo and pushes it to the ECR repo. Images Tagged with Git commit sha and trivy scans the image for vulnerabilities.
 
 ![Docker pipeline](/assets/DOCKER_BUILD_SUCCESS.png)
 
 2 -  Terraform  Deployment
 
- Runs on successfulcompletion of the docker build, initialises new terraform changes, checks via terraform validate and tflint and then applies the new changes / image to AWS.
+ Runs on successfulcompletion of the docker build, initialises new terraform changes, checks via terraform validate and tflint and then applies the new changes / image to AWS. A trivy scan report is also published to the security section of the github repo.
 
- ** Boostrapping: Needs to be run first on a fresh deployment to create the ECR repository.
+ ***Bootstrapping***: Needs to be run first on a fresh deployment to create the ECR repository.
 
 ![Terraform Deployment workflow](/assets/TF_DEPLOY_SUCCESS.png)
 
@@ -59,21 +59,23 @@ Tears down created resources, requires additional confirmation typing 'yes' to m
 
 - Docker is used to containerise the application via a multi-stage build, which reduces the image size for faster deployment and the container is run os-less in scratch as non-root for a reduced attack surface improving security.
 
+![Multi-stage comparison](/assets/mutli-stage-comparison.png)
+
 - OIDC is used in the CI/CD pipeline, providing short term credentials for the repository to access AWS, with the concept of least privledge being applied, the build and deploy workflows have seperate IAM roles, scoped to their function.
 
-- The ECS service runs in a private subnet, with internet access through a nat gateway.
+- The application is hosted on ECS Fargate removing the need to manually manage server resources, this was the best option for a singular container deployment, as something like EKS would be overkill. 
+
+- The ECS service runs in a private subnet, with internet access through a NAT gateway.
+
+- Terraform state is hosted remotely via an S3 backend with state locking in order to avoid state conflict from two or more processes editing the file at the same time and also to provide a reliable storage option for the state to work on multiple devices.
 
 - container Images are tagged with the git commit SHA for easy identification
 
 - The domain itself is hosted on Cloudflare which makes ACM more complex, but provides benefits in the DNS remaining cloud agnostic and able utilise cloudflare features.
 
-- The AWS configuration makes use of two availability zones to make sure the application is always accessible
+- The AWS configuration makes use of two availability zones to make sure the application is more resilient.
 
 - Https is enforced; http traffic is routed to port 443
-
-- The application is hosted on ECS Fargate removing the need to manually manage server resources, this was the best option for a singular container deployment, as something like EKS would be overkill. 
-
-- Terraform state is hosted remotely via an S3 backend with state locking in order to avoid state conflict from two or more processes editing the file at the same time and also to provide a secure storage option for the state to work on multiple devices.
 
 - Terraform resources are modularised to make the configuration easily reproducable, organised and conistent. 
 
@@ -131,7 +133,7 @@ git clone https://github.com/KrisKashi/ECS.git
 
 2: Setup remote state
 
-Create an s3 bucket to store the terraform state and update the provider block with your bucket details
+Create an ***s3 bucket*** to store the terraform state and update the provider block with your bucket details
 
 
 3: Configure secrets as a github action secrets/variables
@@ -143,7 +145,6 @@ Create an s3 bucket to store the terraform state and update the provider block w
 - Terraform_role & ECR_role with relevant permissions
  (IAM setup)
 
-
 4. Setup OIDC with github actions via AWS
 
 [https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws]
@@ -152,7 +153,7 @@ Create an s3 bucket to store the terraform state and update the provider block w
 5. First deployment
 
 
-- The first deployment must run the terraform workflow first to intialise the ECR repo, without this the push workflow will not have a repo to push to. From there you can run the Build and push workflow and the entire operation should complete successfully.
+- The ***first deployment*** must run the terraform workflow first to intialise the ECR repo, without this the push workflow will not have a repo to push to. From there you can run the Build and push workflow and the entire operation should complete successfully.
 
 6. Health
 
